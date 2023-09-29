@@ -51,9 +51,11 @@ export default function App() {
                 Demand Industries Filters
             </h1>
             <div className="mt-4 flex gap-4 items-center">
-                <Button onClick={() => add()}>Create New Filter</Button>
-                {filters.length > 0 && (
-                    <Button>
+                <Button onClick={() => add()} className="bg-yellow-100">
+                    Create New Filter
+                </Button>
+                {filters.length > 1 && (
+                    <Button className="bg-green-100">
                         <CSVLink
                             data={filters.map((f) =>
                                 f.filter.map((x) => x.value)
@@ -61,9 +63,7 @@ export default function App() {
                             filename="industry-filters.csv"
                             target="_blank"
                         >
-                            {filters.length === 1
-                                ? "Export filter"
-                                : `Export All (${filters.length} filters)`}
+                            CSV Export All ({filters.length} filters)
                         </CSVLink>
                     </Button>
                 )}
@@ -88,6 +88,7 @@ function Filter({ filter, onChange, onRemove, onExport }) {
         <div className="flex items-center gap-2">
             <Select
                 className="flex-grow"
+                placeholder="Select one or more industries"
                 value={filter}
                 isSearchable={true}
                 isMulti={true}
@@ -100,14 +101,19 @@ function Filter({ filter, onChange, onRemove, onExport }) {
                 // @ts-ignore
                 options={options}
             />
-            <Button className="flex-grow-0" onClick={onExport}>
-                Export filter
+            <Button
+                title="Export this individual filter as text"
+                className="flex-grow-0 bg-green-50"
+                onClick={onExport}
+            >
+                Single Text Export
             </Button>
             <Button
-                className="flex-grow-0 bg-red-600 text-white"
+                title="Remove this filter"
+                className="flex-grow-0 bg-red-500 text-white"
                 onClick={onRemove}
             >
-                X
+                ✕
             </Button>
         </div>
     );
