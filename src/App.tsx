@@ -2,24 +2,47 @@ import { clsx } from "clsx";
 import { useState } from "react";
 import { CSVLink } from "react-csv";
 import Select, { ActionMeta, MultiValue } from "react-select";
-import { INDUSTRIES } from "./industries";
+import {
+    COMPANY_INDUSTRIES,
+    POSITION_INDUSTRIES,
+    POSITION_JOB_FUNCTIONS,
+} from "./options";
 
 interface Option {
     label: string;
     value: string;
 }
 
-const options = INDUSTRIES.map((i) => ({ value: i, label: i }));
+interface Filter {
+    id: number;
+    type: FilterType;
+    filter: Option[];
+}
+
+type FilterType =
+    | "company_industries"
+    | "position_industries"
+    | "position_job_functions";
+
+const OPTIONS = {
+    company_industries: toOptions(COMPANY_INDUSTRIES),
+    position_industries: toOptions(POSITION_INDUSTRIES),
+    position_job_functions: toOptions(POSITION_JOB_FUNCTIONS),
+};
+
+const FILTER_NAMES = {
+    company_industries: "Company Industries",
+    position_industries: "Position Industries",
+    position_job_functions: "Position Job Functions",
+};
 
 export default function App() {
     const [id, setId] = useState(0);
-    const [filters, setFilters] = useState<{ id: number; filter: Option[] }[]>(
-        []
-    );
+    const [filters, setFilters] = useState<Filter[]>([]);
 
-    const add = () => {
+    const add = (type: FilterType) => {
         const filtersCopy = structuredClone(filters);
-        filtersCopy.push({ id, filter: [] });
+        filtersCopy.push({ id, type, filter: [] });
         setFilters(filtersCopy);
         setId(id + 1);
     };
@@ -48,19 +71,35 @@ export default function App() {
     return (
         <Layout>
             <h1 className="mt-10 mb-6 text-6xl font-bold text-center">
-                Demand Industries Filters
+                Demand Filters
             </h1>
             <div className="mt-4 flex gap-4 items-center">
-                <Button onClick={() => add()} className="bg-yellow-100">
-                    Create New Filter
+                <Button
+                    onClick={() => add("company_industries")}
+                    className="bg-yellow-100"
+                >
+                    + Company Industries
+                </Button>
+                <Button
+                    onClick={() => add("position_industries")}
+                    className="bg-yellow-100"
+                >
+                    + Position Industries
+                </Button>
+                <Button
+                    onClick={() => add("position_job_functions")}
+                    className="bg-yellow-100"
+                >
+                    + Position Job Functions
                 </Button>
                 {filters.length > 1 && (
                     <Button className="bg-green-100">
                         <CSVLink
-                            data={filters.map((f) =>
-                                f.filter.map((x) => x.value)
-                            )}
-                            filename="industry-filters.csv"
+                            data={filters.map((f) => [
+                                f.type,
+                                ...f.filter.map((x) => x.value),
+                            ])}
+                            filename="demand-filters.csv"
                             target="_blank"
                         >
                             CSV Export All ({filters.length} filters)
@@ -72,6 +111,7 @@ export default function App() {
                 {filters.map((f) => (
                     <Filter
                         key={f.id}
+                        type={f.type}
                         filter={f.filter}
                         onChange={(value) => update(f.id, value)}
                         onRemove={() => remove(f.id)}
@@ -83,12 +123,13 @@ export default function App() {
     );
 }
 
-function Filter({ filter, onChange, onRemove, onExport }) {
+function Filter({ type, filter, onChange, onRemove, onExport }) {
     return (
         <div className="flex items-center gap-2">
+            <span className="w-48">{FILTER_NAMES[type]}</span>
             <Select
                 className="flex-grow"
-                placeholder="Select one or more industries"
+                placeholder={"Select one or more industries"}
                 value={filter}
                 isSearchable={true}
                 isMulti={true}
@@ -99,7 +140,7 @@ function Filter({ filter, onChange, onRemove, onExport }) {
                     onChange([...newValue]);
                 }}
                 // @ts-ignore
-                options={options}
+                options={OPTIONS[type]}
             />
             <Button
                 title="Export this individual filter as text"
@@ -149,4 +190,8 @@ function Button({ children, onClick, ...props }: ButtonProps) {
             {children}
         </button>
     );
+}
+
+function toOptions(input: string[]): Option[] {
+    return input.map((i) => ({ value: i, label: i }));
 }
