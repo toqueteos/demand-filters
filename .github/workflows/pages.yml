@@ -27,7 +27,10 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   node-version: 20
-                  cache: "pnpm"
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -37,7 +40,6 @@ jobs:
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v1
               with:
-                  # Upload dist repository
                   path: "./dist"
             - name: Deploy to GitHub Pages
               id: deployment
