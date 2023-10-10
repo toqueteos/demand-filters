@@ -36,6 +36,12 @@ const FILTER_NAMES = {
     position_job_functions: "Position Job Functions",
 };
 
+const FILTER_PLACEHOLDERS = {
+    company_industries: "Select one or more industries",
+    position_industries: "Select one or more industries",
+    position_job_functions: "Select one or more job functions",
+};
+
 export default function App() {
     const [id, setId] = useState(0);
     const [filters, setFilters] = useState<Filter[]>([]);
@@ -129,7 +135,7 @@ function Filter({ type, filter, onChange, onRemove, onExport }) {
             <span className="w-48">{FILTER_NAMES[type]}</span>
             <Select
                 className="flex-grow"
-                placeholder={"Select one or more industries"}
+                placeholder={FILTER_PLACEHOLDERS[type]}
                 value={filter}
                 isSearchable={true}
                 isMulti={true}
