@@ -92,7 +92,7 @@ export default function App() {
                 >
                     + Position Job Functions
                 </Button>
-                {filters.length > 1 && (
+                {filters.length > 0 && (
                     <Button className="bg-green-100">
                         <CSVLink
                             data={filters.map((f) => [
